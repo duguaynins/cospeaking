@@ -233,8 +233,9 @@
               <button id="nextAllBtn">⏭️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Next</p></button>
               <button id="speakBtn">▶️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Play</p></button>
               <button id="stopBtn">⏸️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Stop</p></button>
+              <button id="switchBtn">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Switch</p></button>
           </div>
-          <input class="" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: block;"/>
+          <input class="" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: none;"/>
           
           <!-- 放置你原有的布局 -->
           <!--strong></strong-->
@@ -252,6 +253,123 @@
 
 
     <!-- 放置你原有的布局 -->
+
+<script>
+/* --- TOUCH 功能 --- */
+// 全螢幕畫布
+const carousel = document.getElementById('pdfCanvas');
+let startX = 0;
+let isDragging = false;
+
+// 收放輸入框
+document.getElementById('switchBtn').addEventListener('click', () => {
+  if (document.getElementById('txt').style.display === 'none') {
+    document.getElementById('txt').style.display = 'block'; // 顯示元素
+  } else {
+    document.getElementById('txt').style.display = 'none';  // 隱藏元素
+  }
+});
+
+// 鍵盤控制
+window.addEventListener('keydown', e => {
+  ///if (e.code === 'Space') {  }
+  if (e.key === 'ArrowRight') {
+      if(!pdfDoc) return;
+      if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
+      
+      if(lines.length===0) return;
+      currentIndex = (currentIndex +1) % lines.length;
+      txt.value = lines[currentIndex];
+  };
+  if (e.key === 'ArrowLeft') {
+      if(!pdfDoc) return;
+      if(currentPage > 1){ currentPage--; renderPage(currentPage); }
+      
+      if(lines.length===0) return;
+      currentIndex = (currentIndex -1 + lines.length) % lines.length;
+      txt.value = lines[currentIndex];
+  }
+  if (e.key === ' ') { 
+    let text = txt.value.trim();
+    if(!text && pdfDoc){
+      alert('請先選擇文字或輸入要讀的文字。');
+      return;
+    }
+    if('speechSynthesis' in window){
+      if(speechSynthesis.speaking) speechSynthesis.cancel();
+      else {
+        currentUtter = new SpeechSynthesisUtterance(text);
+        currentUtter.rate = document.getElementById('rateSlider').value || 2;
+
+        ///const selectedVoice = voices[voiceSelect.value];  ///???
+        const selectedVoice = voices[parseInt(voiceSelect.value)];  ///???
+        if (selectedVoice) { currentUtter.voice = selectedVoice; }  ///???
+
+        currentUtter.onend = ()=> console.log('播放結束');
+        currentUtter.onerror = e=> console.error('播放錯誤', e);
+        speechSynthesis.speak(currentUtter);
+      }
+    } else {
+      alert('瀏覽器不支援 Web Speech API');
+    }
+  }
+  ///updateCarousel();
+});
+
+document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
+  canvas.addEventListener("click", async () => {
+    // 若尚未進入全螢幕 → 請求全螢幕
+    if (!document.fullscreenElement) {
+      try {
+        canvas.style.background = "white"; // ← 進入全螢幕時套用白色背景
+
+        await canvas.requestFullscreen();
+        // 強制橫向顯示（支援的瀏覽器才有效）
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock("landscape").catch(() => {});
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      // 若已在全螢幕 → 退出
+      document.exitFullscreen();
+      ///canvas.style.background = "transparent"; // ← 退出後恢復
+      ///downloadPNG(canvas);
+    }
+  });
+});
+/*
+// 其他控制
+document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
+  // 手機觸控
+  canvas.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+  });
+  canvas.addEventListener('touchend', e => {
+    let delta = e.changedTouches[0].clientX - startX;
+    if (delta > 50) currentIndex = Math.max(0, currentIndex - 1);
+    if (delta < -50) currentIndex = Math.min(canvases.length-1, currentIndex + 1);
+    updateCarousel();
+  });
+  // 電腦滑鼠拖動
+  canvas.addEventListener('mousedown', e => {
+    isDragging = true;
+    startX = e.clientX;
+  });
+  canvas.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+  });
+  canvas.addEventListener('mouseup', e => {
+    if (!isDragging) return;
+    let delta = e.clientX - startX;
+    if (delta > 50) currentIndex = Math.max(0, currentIndex - 1);
+    if (delta < -50) currentIndex = Math.min(canvases.length-1, currentIndex + 1);
+    updateCarousel();
+    isDragging = false;
+  });
+}); */
+</script>
 
 
 <script>
@@ -318,6 +436,8 @@ const renderPage = async (num)=>{
   };
   await page.render(renderCtx).promise;
   pageInfo.textContent = `頁面 ${num} / ${totalPages}`;
+  ///pdfCanvas.style.border = "1px solid black";
+  pdfCanvas.style.border = "1px solid #cdcdcd";
 };
 
 fileInputPdf.addEventListener('change', e=>{
@@ -409,7 +529,8 @@ speakBtn.addEventListener('click', ()=>{
     currentUtter = new SpeechSynthesisUtterance(text);
     currentUtter.rate = document.getElementById('rateSlider').value || 2;
 
-    const selectedVoice = voices[voiceSelect.value];  ///???
+    ///const selectedVoice = voices[voiceSelect.value];  ///???
+    const selectedVoice = voices[parseInt(voiceSelect.value)];  ///???
     if (selectedVoice) { currentUtter.voice = selectedVoice; }  ///???
 
     currentUtter.onend = ()=> console.log('播放結束');
