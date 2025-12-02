@@ -9,6 +9,8 @@
   <!--link rel="shortcut icon" href="/favicon.ico"-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title translate="no">nins/cospeaking</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
     body {
       overflow: hidden;
@@ -119,12 +121,12 @@
     }
     
     input:hover {
-      background-color: #cdcdcd;    ///FF3B00;
-      color: black;///gray;
+      background-color: #cdcdcd;
+      color: black;
     }
     input:active {
-      background-color: #222222;  ///#004080;
-      color: white;///gray;
+      background-color: #222222;
+      color: white;
     }
     input:focus {
       outline: none;              /* 移除預設藍色邊框 */
@@ -133,25 +135,10 @@
       border: 2px solid red;       /* 或使用 #f44336 */
       box-shadow: 0 0 5px red;
     }
-    .twod {
-      /*width: 100vmin;
-      height: 100vmin;*/
-    }
-    .oned {
-      /*width: 100vmin;
-      height: 10vmin;*/
-    }
-    .thumb { 
-      /*width: 87vw;*/
-      width: 100px;
-      height: 60px;
-      margin: 0.5em;
-      padding: 0.5em; /* 這裡增加5像素的內距離 */
-      cursor: pointer;
-      border: 1px solid #ccc;
-      object-fit: contain;
-      display: none;
-      flex-shrink: 0;        /* 防止被壓縮 */
+  </style>
+  <style>
+    .hotkey > * {
+      width: 25vw;
     }
   </style>
 </head>
@@ -201,24 +188,247 @@
       flex-direction: column;
     ">
           <div style="background: #FFFFFF; color: black;" translate="no">
-          <div style="margin: 10px;" onclick="document.getElementById('DialogShare').showModal()">
+          <div style="height: 2vh; margin: 10px;" onclick="document.getElementById('DialogShare').showModal()">
           nins/cospeaking
           </div></div>
+          <!-- 放置你原有的布局 -->
+
+
+          <div style="background: #FFFFFF; width: 100%; flex:1; border: 1px solid #ccc;">
+
+
+
+
+
+<div id="pdfContainer">
+  <canvas id="pdfCanvas" style="max-height: 66vh; height: auto; width: auto; padding: 0px; margin: 0px;"></canvas>
+  <p id="pageInfo"></p>
+</div>
+
+<!--textarea id="txt" placeholder="在此輸入要轉語音的文字..."></textarea-->
+
+
+
+
+          </div>
           
-              <!-- 放置你原有的布局 -->
-              <div style="background: #FFFFFF; overflow:auto; width:100%; flex:1; border: 1px solid #ccc;">
-              </div>
-              <!-- 放置你原有的布局 -->
-            
+          <div class="row" id="fileInputPdfRow">
+            <!--label for="fileInputPdf" class="custom-btn">上傳報告檔</label-->
+            <button class="custom-btn" style="color: #000000; height: 5vh; width: 100vw;" onclick="document.getElementById('fileInputPdf').click()">1️⃣ Load report file</button>
+            <input type="file" id="fileInputPdf" accept=".pdf" style="display:none;">
+            <!--span translate="no">←(.pdf)</span-->
+          </div>
+          <div class="row" id="fileInputTxtRow">
+            <!--label for="fileInputTxt" class="custom-btn">上傳文字檔</label-->
+            <button class="custom-btn" style="color: #000000; height: 5vh; width: 100vw;" onclick="document.getElementById('fileInputTxt').click()">2️⃣ Load text file</button>
+            <input type="file" id="fileInputTxt" accept=".txt" style="display:none;">
+            <!--span translate="no">←(.txt)</span-->
+          </div>
+
+          <select id="voiceSelect" style="width: 100vw; height: 3vh;"></select>
+
+          <div class="hotkey" style="height: 5vh; margin: 0vw; display: flex; flex-direction: row; border: 2px solid #cdcdcd; animation: hardBlink 1.0s steps(1, start) infinite;" translate="no">
+              <button id="prevAllBtn" class="secondary">⏮️</button>
+              <button id="nextAllBtn" class="secondary">⏭️</button>
+              <button id="speakBtn">▶️</button>
+              <button id="stopBtn" class="secondary">⏸️</button>
+          </div>
+          <input class="main" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: block;"/>
+          
+          <!-- 放置你原有的布局 -->
           <!--strong></strong-->
-          <div style="background: #FF3B00; color: white;" translate="yes">
+          <div style="height: 5vh; background: #FF3B00; color: white;" translate="yes">
           <div style="margin: 10px;" onclick="document.getElementById('DialogTool').showModal()">
           By sending a message to this service, it means you have agreed to any content and all content!
           </div></div>
     </div>
     
+
+
+
+
+
+
+
     <!-- 放置你原有的布局 -->
+
+
+<script>
+/* --- TXT 功能 --- */
+const txt = document.getElementById('txt');
+const fileInputTxt = document.getElementById('fileInputTxt');
+const prevTxtBtn = document.getElementById('prevAllBtn');  ///prevTxtBtn
+const nextTxtBtn = document.getElementById('nextAllBtn');  ///nextTxtBtn
+
+let lines = [];
+let currentIndex = 0;
+
+// 讀取 TXT
+fileInputTxt.addEventListener('change', e=>{
+  document.getElementById('fileInputTxtRow').style.display = "none";
+
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (event)=>{
+    lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
+    currentIndex = 0;
+    txt.value = lines[currentIndex] || '';
+  };
+  reader.readAsText(file);
+});
+
+prevTxtBtn.addEventListener('click', ()=>{
+  if(lines.length===0) return;
+  currentIndex = (currentIndex -1 + lines.length) % lines.length;
+  txt.value = lines[currentIndex];
+});
+
+nextTxtBtn.addEventListener('click', ()=>{
+  if(lines.length===0) return;
+  currentIndex = (currentIndex +1) % lines.length;
+  txt.value = lines[currentIndex];
+});
+
+
+</script>
+
+
+<script>
+/* --- PDF 功能 --- */
+const fileInputPdf = document.getElementById('fileInputPdf');
+const pdfCanvas = document.getElementById('pdfCanvas');
+const pageInfo = document.getElementById('pageInfo');
+const prevPdfBtn = document.getElementById('prevAllBtn');  ///prevPdfBtn
+const nextPdfBtn = document.getElementById('nextAllBtn');  ///nextPdfBtn
+
+let pdfDoc = null;
+let currentPage = 1;
+let totalPages = 0;
+
+const renderPage = async (num)=>{
+  const page = await pdfDoc.getPage(num);
+  const viewport = page.getViewport({ scale: 1.5 });
+  pdfCanvas.height = viewport.height;
+  pdfCanvas.width = viewport.width;
+  const renderCtx = {
+    canvasContext: pdfCanvas.getContext('2d'),
+    viewport
+  };
+  await page.render(renderCtx).promise;
+  pageInfo.textContent = `頁面 ${num} / ${totalPages}`;
+};
+
+fileInputPdf.addEventListener('change', e=>{
+  document.getElementById('fileInputPdfRow').style.display = "none";
+
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (event)=>{
+    const typedarray = new Uint8Array(event.target.result);
+    pdfDoc = await pdfjsLib.getDocument({data: typedarray}).promise;
+    totalPages = pdfDoc.numPages;
+    currentPage = 1;
+    renderPage(currentPage);
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+prevPdfBtn.addEventListener('click', ()=>{
+  if(!pdfDoc) return;
+  if(currentPage > 1){ currentPage--; renderPage(currentPage); }
+});
+
+nextPdfBtn.addEventListener('click', ()=>{
+  if(!pdfDoc) return;
+  if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
+});
+
+</script>
+
+
+<script>
+/* --- TTS 選擇 --- */
+const voiceSelect = document.getElementById('voiceSelect');
+let voices = [];
+
+function languageScript(tag) {
+  return tag.split('-').slice(0, 2).join('-');
+}
+function languageRegion(tag) {
+  const match = tag.match(/^([^-]+)-([^-]+)$/); // 嘗試匹配兩段
+  if (match) return match[1] + '-' + match[2];
+  
+  // 如果有三段以上，取第一段 + 最後一段
+  const parts = tag.split('-');
+  if (parts.length >= 2) return parts[0] + '-' + parts[parts.length - 1];
+
+  return tag; // 只有語言
+}
+
+function loadVoices() {
+  voices = speechSynthesis.getVoices();
+  voiceSelect.innerHTML = '';
+  voices.forEach((voice, i) => {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = `${voice.name} (${voice.lang})`;
+    voiceSelect.appendChild(option);
+  });
+  
+  // 設定預設語音
+  const language = languageRegion(navigator.language || navigator.userLanguage || "en-US");  // 閱讀母語
+  const defaultVoice = voices.find(v => v.lang === language) || 
+                       voices.find(v => v.lang.startsWith(language.slice(0, 2)));
+  
+  if (defaultVoice) {
+    const index = voices.indexOf(defaultVoice);
+    voiceSelect.value = index;
+  }
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;  // 有些瀏覽器語音需要 async 載入
+loadVoices();  // 預先載一次
+
+
+/* --- TTS 播放 --- */
+const speakBtn = document.getElementById('speakBtn');
+const stopBtn = document.getElementById('stopBtn');
+let currentUtter = null;
+
+speakBtn.addEventListener('click', ()=>{
+  let text = txt.value.trim();
+  if(!text && pdfDoc){
+    alert('請先選擇文字或輸入要讀的文字。');
+    return;
+  }
+  if('speechSynthesis' in window){
+    if(speechSynthesis.speaking) speechSynthesis.cancel();
+    currentUtter = new SpeechSynthesisUtterance(text);
+
+    const selectedVoice = voices[voiceSelect.value];  ///???
+    if (selectedVoice) { currentUtter.voice = selectedVoice; }  ///???
+
+    currentUtter.onend = ()=> console.log('播放結束');
+    currentUtter.onerror = e=> console.error('播放錯誤', e);
+    speechSynthesis.speak(currentUtter);
+  } else {
+    alert('瀏覽器不支援 Web Speech API');
+  }
+});
+
+stopBtn.addEventListener('click', ()=>{
+  if(speechSynthesis.speaking) speechSynthesis.cancel();
+});
+</script>
     <!-- 放置你原有的布局 -->
+
+
+
+
+
+
 
     <script type="text/javascript">  // google.js
       // GOOGLE TRANSLATE
