@@ -422,6 +422,12 @@ document.querySelectorAll("canvas").forEach(canvas => {
         clearTimeout(longPressTimer);
       }
     });
+    
+    canvas.addEventListener('pointerdown', e => console.log('pointerdown'));
+    canvas.addEventListener('pointerup', e => console.log('pointerup'));
+    canvas.addEventListener('pointermove', e => console.log('pointermove'));
+    canvas.addEventListener('touchstart', e => console.log('touchstart'));
+    canvas.addEventListener('touchend', e => console.log('touchend'));
 
     canvas.addEventListener('pointerdown', e => {
       canvas.setPointerCapture(e.pointerId); // 鎖定指標
