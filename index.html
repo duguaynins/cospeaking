@@ -25,7 +25,6 @@
         align-items: center;      /* 水平置中 */
         text-align: center;       /* 文字置中 */
     }
-    canvas { touch-action: none; }
     input, textarea, button, select {
       /*font-size: inherit; /* 主動繼承 body 字體大小 */
       font-size: 18px;
@@ -303,6 +302,7 @@ console.log = function(...args) {
 });
 
 // 測試
+console.log(new Date().toLocaleString(), 'v1.20251203.1315');
 console.log(new Date().toLocaleString(), 'This is a log test.');
 console.error(new Date().toLocaleString(), 'This is an error test.');
 </script>
@@ -333,7 +333,7 @@ document.getElementById('switchBtn').addEventListener('click', () => {
   }
 });
 
-// 鍵盤控制
+// 控制方法統一
 function contrlRight() {
     if(!pdfDoc) return;
     if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
@@ -405,6 +405,7 @@ window.addEventListener('keydown', e => {
   }
   ///updateCarousel();
 });
+
 // 鼠標控制
 document.querySelectorAll("canvas").forEach(canvas => {
     let startX = 0;
@@ -413,7 +414,18 @@ document.querySelectorAll("canvas").forEach(canvas => {
     let longPressTimer = null;
     let longPressTriggered = false;
 
+    canvas.addEventListener('pointermove', e => {
+      // 如果移動太多就取消長按
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if(Math.abs(dx) > 10 || Math.abs(dy) > 10){
+        clearTimeout(longPressTimer);
+      }
+    });
+
     canvas.addEventListener('pointerdown', e => {
+      canvas.setPointerCapture(e.pointerId); // 鎖定指標
+      console.log(new Date().toLocaleString(), 'pointerdown and setPointerCapture');
       isPointerDown = true;
       startX = e.clientX;
       startY = e.clientY;
@@ -425,16 +437,9 @@ document.querySelectorAll("canvas").forEach(canvas => {
       }, 500); // 長按時間
     });
 
-    canvas.addEventListener('pointermove', e => {
-      // 如果移動太多就取消長按
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      if(Math.abs(dx) > 10 || Math.abs(dy) > 10){
-        clearTimeout(longPressTimer);
-      }
-    });
-
     canvas.addEventListener('pointerup', e => {
+      canvas.releasePointerCapture(e.pointerId); // 鎖定指標
+      console.log(new Date().toLocaleString(), 'pointerup and releasePointerCapture');
       clearTimeout(longPressTimer);
       if (!isPointerDown) return;
       isPointerDown = false;
