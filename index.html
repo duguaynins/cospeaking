@@ -256,8 +256,9 @@
               <button id="speakBtn">▶️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Play</p></button>
               <button id="stopBtn">⏸️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Stop</p></button>
 
-              <button id="switchinputBtn" disabled="">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">switchinput</p></button>
               <button id="fullscreenBtn" disabled="">👀<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">fullscreen</p></button>
+              <button id="switchinputBtn" disabled="">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">switchinput</p></button>
+              
           </div>
           <input class="" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: none;"/>
           
@@ -630,14 +631,15 @@ let currentIndex = 0;
 
 // 讀取 TXT
 fileInputTxt.addEventListener('change', e=>{
-  document.getElementById('fileInputTxtRow').style.display = "none";
-  document.getElementById('switchinputBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
   ///if(!file) return;
   if (!e.target.files || e.target.files.length === 0) { console.log("file0");window.open("https://cospeaking.nins.cc/inputs/example.txt", "_blank", "noopener,noreferrer");return; }
-  if (file.type !== 'text/plain') { setTimeout(() => { window.open("https://cospeaking.nins.cc/inputs/example.txt", "_blank", "noopener,noreferrer"); }, 100);  }
+  if (file.type !== 'text/plain') { setTimeout(() => { window.open("https://cospeaking.nins.cc/inputs/example.txt", "_blank", "noopener,noreferrer"); }, 100);return;  }
   
+  document.getElementById('fileInputTxtRow').style.display = "none";
+  document.getElementById('switchinputBtn').disabled  = false;  // 取消禁用元素
+
   const reader = new FileReader();
   reader.onload = (event)=>{
     lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
@@ -696,14 +698,15 @@ const renderPage = async (num)=>{
 };
 
 fileInputPdf.addEventListener('change', e=>{
-  document.getElementById('fileInputPdfRow').style.display = "none";
-  document.getElementById('fullscreenBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
   ///if(!file) return;
   if (!e.target.files || e.target.files.length === 0) { console.log("file0");window.open("https://cospeaking.nins.cc/inputs/example.pdf", "_blank", "noopener,noreferrer");return; }
-  if (file.type !== 'application/pdf') { setTimeout(() => { window.open("https://cospeaking.nins.cc/inputs/example.pdf", "_blank", "noopener,noreferrer"); }, 100);  }
+  if (file.type !== 'application/pdf') { setTimeout(() => { window.open("https://cospeaking.nins.cc/inputs/example.pdf", "_blank", "noopener,noreferrer"); }, 100);return;  }
   
+  document.getElementById('fileInputPdfRow').style.display = "none";
+  document.getElementById('fullscreenBtn').disabled  = false;  // 取消禁用元素
+
   const reader = new FileReader();
   reader.onload = async (event)=>{
     const typedarray = new Uint8Array(event.target.result);
