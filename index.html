@@ -329,7 +329,7 @@ let startX = 0;
 let isDragging = false;
 
 // 收放輸入框
-document.getElementById('switchinput').addEventListener('click', () => {
+document.getElementById('switchinputBtn').addEventListener('click', () => {
   if (document.getElementById('txt').style.display === 'none') {
     document.getElementById('txt').style.display = 'block'; // 顯示元素
   } else {
@@ -629,7 +629,7 @@ let currentIndex = 0;
 // 讀取 TXT
 fileInputTxt.addEventListener('change', e=>{
   document.getElementById('fileInputTxtRow').style.display = "none";
-  document.getElementById('switchinput').disabled  = false;  // 取消禁用元素
+  document.getElementById('switchinputBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
   if(!file) return;
