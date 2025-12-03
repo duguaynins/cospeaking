@@ -354,7 +354,15 @@ window.addEventListener('keydown', e => {
       ///const voice = voices[parseInt(voiceSelect.value)];  ///???
       ///if (voice) { msg.voice = voice; }  ///???
 
-      console.log(new Date().toLocaleString(), voice);
+      ///console.log(new Date().toLocaleString(), voice);                   // 不可列舉，無法這樣顯示***
+      ///console.log(new Date().toLocaleString(), JSON.stringify(voice));   // 不可列舉，無法這樣顯示***
+      console.log(new Date().toLocaleString(),   {
+        name: voice.name,
+        lang: voice.lang,
+        ///voiceURI: voice.voiceURI,
+        ///localService: voice.localService,
+        ///default: voice.default
+      });
 
       msg.onend = ()=> console.log(new Date().toLocaleString(), '播放結束');
       msg.onerror = e=> console.error(new Date().toLocaleString(), '播放錯誤', e);
@@ -592,7 +600,15 @@ speakBtn.addEventListener('click', ()=>{
       ///const voice = voices[parseInt(voiceSelect.value)];  ///???
       ///if (voice) { msg.voice = voice; }  ///???
 
-      console.log(new Date().toLocaleString(), voice);
+      ///console.log(new Date().toLocaleString(), voice);                   // 不可列舉，無法這樣顯示***
+      ///console.log(new Date().toLocaleString(), JSON.stringify(voice));   // 不可列舉，無法這樣顯示***
+      console.log(new Date().toLocaleString(),   {
+        name: voice.name,
+        lang: voice.lang,
+        ///voiceURI: voice.voiceURI,
+        ///localService: voice.localService,
+        ///default: voice.default
+      });
 
       msg.onend = ()=> console.log(new Date().toLocaleString(), '播放結束');
       msg.onerror = e=> console.error(new Date().toLocaleString(), '播放錯誤', e);
