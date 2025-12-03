@@ -218,7 +218,8 @@
     <h1 translate="no" style="margin: 0;">© 2024 NINS. 👻</h1>
     <p translate="no" style="margin: 0; color: red;">(by JPGT)</p>
     <!--p>📌 I will accompany you during your speak. 🕛</p-->
-    <p><span translate="no"> 📌 </span>I will accompany you, whether you are speaking.</p>
+    <!--p><span translate="no"> 📌 </span>I will accompany you, whether you are speaking.</p-->
+    <p><span translate="no"> 📌 </span>I will accompany you onto the stage, whether you are speaking or not.</p>
     <!--p>💡 Each line of the text file will be compiled into a playlist.</p-->
     <p><span translate="no"> 💡 </span>Each line in the text file will be compiled individually, and then merged into a single playlist.</p>
     <p><span translate="no"> 💡 </span>If you don’t know how to use it, just press all the buttons once and it will work!</p>
@@ -349,6 +350,13 @@ window.addEventListener('keydown', e => {
       if(lines.length===0) return;
       currentIndex = (currentIndex -1 + lines.length) % lines.length;
       txt.value = lines[currentIndex];
+  }
+  if (e.ctrlKey) { 
+    if('speechSynthesis' in window){
+      if(window.speechSynthesis.speaking) window.speechSynthesis.cancel(); 
+    } else {
+      ///alert('瀏覽器不支援 Web Speech API');
+    }
   }
   if (e.key === ' ') { 
     let text = txt.value.trim();
