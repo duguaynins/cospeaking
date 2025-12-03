@@ -258,7 +258,7 @@
           <input class="" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: none;"/>
           
           <!-- 放置你原有的布局 -->
-          <!--strong></strong-->
+          <!--strong>⏮️⏭️▶️⏸️</strong-->
           <div style="background: #FF3B00; color: white;" translate="yes">
           <div style="margin: 10px;" onclick="document.getElementById('DialogTool').showModal()">
           By sending a message to this service, it means you have agreed to any content and all content!
@@ -335,6 +335,7 @@ document.getElementById('switchBtn').addEventListener('click', () => {
 
 // 控制方法統一
 function contrlRight() {
+    console.log("⏭️");
     if(!pdfDoc) return;
     if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
     
@@ -343,6 +344,7 @@ function contrlRight() {
     txt.value = lines[currentIndex];
 }
 function contrlLeft() {
+    console.log("⏮️");
     if(!pdfDoc) return;
     if(currentPage > 1){ currentPage--; renderPage(currentPage); }
     
@@ -350,7 +352,16 @@ function contrlLeft() {
     currentIndex = (currentIndex -1 + lines.length) % lines.length;
     txt.value = lines[currentIndex];
 }
+function contrlStop() { 
+    console.log("⏸️");
+    if('speechSynthesis' in window){
+      if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+    } else {
+      ///alert('瀏覽器不支援 Web Speech API');
+    }
+}
 function contrlPlay() {
+    console.log("▶️");
     let text = txt.value.trim();
     if(!text && pdfDoc){
       ///alert('請先選擇文字或輸入要讀的文字。');
@@ -394,9 +405,12 @@ function contrlPlay() {
 // 鍵盤控制
 window.addEventListener('keydown', e => {
   ///if (e.code === 'Space') {  }
+  if (e.ctrlKey) { 
+    contrlStop(); 
+  }
   if (e.key === 'ArrowRight') {
     contrlRight();
-  };
+  }
   if (e.key === 'ArrowLeft') {
     contrlLeft();
   }
@@ -406,6 +420,34 @@ window.addEventListener('keydown', e => {
   ///updateCarousel();
 });
 
+
+// 鼠標控制  // 棄用此區域
+/*
+function onMove(e) {
+  if(!isPointerDown) return;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  // 這裡判斷上下左右滑動
+}
+function onDown(e) {
+  isPointerDown = true;
+  ///startX = e.clientX;
+  ///startY = e.clientY;
+  longPressTriggered = false;
+  
+  longPressTimer = setTimeout(() => {
+    longPressTriggered = true;
+    contrlLongPress();
+  }, 500); 
+}
+function onUp(e) {
+  isPointerDown = false;
+  clearTimeout(longPressTimer);
+  if(!longPressTriggered){
+    // 判定為 tap 或滑動結束
+  }
+} */
+
 // 鼠標控制
 document.querySelectorAll("canvas").forEach(canvas => {
     let startX = 0;
@@ -413,6 +455,7 @@ document.querySelectorAll("canvas").forEach(canvas => {
     let isPointerDown = false;
     let longPressTimer = null;
     let longPressTriggered = false;
+    console.log("⏮️⏭️▶️⏸️");
 
     canvas.addEventListener('pointermove', e => {
       // 如果移動太多就取消長按
@@ -425,38 +468,97 @@ document.querySelectorAll("canvas").forEach(canvas => {
     
     canvas.addEventListener('touchstart', e => console.log('touchstart'));
     canvas.addEventListener('touchend', e => console.log('touchend'));
-    canvas.addEventListener('pointerdown', e => console.log('pointerdown'));
-    canvas.addEventListener('pointerup', e => console.log('pointerup'));
+    ///canvas.addEventListener('pointerdown', e => console.log('pointerdown'));
+    ///canvas.addEventListener('pointerup', e => console.log('pointerup'));
     ///canvas.addEventListener('pointermove', e => console.log('pointermove'));
+
+    
+    canvas.addEventListener('pointerup', e => {
+      canvas.releasePointerCapture(e.pointerId); // 釋放指標
+      isPointerDown = false;
+      ///longPressTriggered = false;
+      console.log(new Date().toLocaleString(), 'pointerup and releasePointerCapture');
+      console.log(e.clientX, e.clientY);
+
+      clearTimeout(longPressTimer);
+    });
+
+    canvas.addEventListener('pointerdown', e => {
+      canvas.setPointerCapture(e.pointerId); // 鎖定指標
+      isPointerDown = true;
+      longPressTriggered = false;
+      console.log(new Date().toLocaleString(), 'pointerup and setPointerCapture');
+      console.log(e.clientX, e.clientY);
+
+      clearTimeout(longPressTimer);
+
+      longPressTimer = setTimeout(() => {
+        console.log("longPressTimer 1");
+        contrlPlay();///contrlLongPress();
+        ///isPointerDown = null;  // 非必要不啟用此行
+        ///longPressTriggered = true;  // 非必要不啟用此行
+      }, 500); 
+
+      startX = e.clientX;
+      startY = e.clientY;
+
+    });
 
     canvas.addEventListener('pointermove', e => {
       if(!isPointerDown) return; // 必須按住
+      ///if(!longPressTriggered) return;
 
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
       const absX = Math.abs(dx);
       const absY = Math.abs(dy);
-      const threshold = 10; // 避免輕微抖動被判斷為滑動
+      ///const threshold = 10; // 避免輕微抖動被判斷為滑動
+      ///const threshold = 50; // 滑動需要的最小距離
+      const threshold = canvas.clientWidth * 0.05; // 5% 的畫布寬度
+
+      // 如果按著時間夠長
+      if (longPressTriggered) {
+        // 如果只有少量移動
+        if(Math.abs(dx) > 10 || Math.abs(dy) > 10) {  }
+
+        ///clearTimeout(longPressTimer);  // 已觸發！再呼叫 clearTimeout 也沒有作用了！
+        
+        console.log("longPressTimer 3");
+        contrlPlay();///contrlLongPress();
+        ///isPointerDown = false;
+        ///longPressTriggered = false;
+        return;  // 若已經觸發長按，不再判定滑動或點擊
+      }
+
+      ///isPointerDown = false;  // 不可啟用此行？對！
 
       // 水平滑動
       if(absX > absY && absX > threshold){
         if(dx > 0){
           console.log("向右滑動", dx);contrlLeft();
-          // 可呼叫 contrlRight()
+          isPointerDown = false;
+          longPressTriggered = false;
+          return;
         } else {
           console.log("向左滑動", dx);contrlRight();
-          // 可呼叫 contrlLeft()
+          isPointerDown = false;
+          longPressTriggered = false;
+          return;
         }
       }
 
       // 垂直滑動
       else if(absY > absX && absY > threshold){
         if(dy > 0){
-          console.log("向下滑動", dy);contrlPlay();
-          // 可呼叫 contrlDown()
+          console.log("向下滑動", dy);///contrlPlay();
+          isPointerDown = false;
+          longPressTriggered = false;
+          return;
         } else {
-          console.log("向上滑動", dy);contrlPlay();
-          // 可呼叫 contrlUp()
+          console.log("向上滑動", dy);///contrlPlay();
+          isPointerDown = false;
+          longPressTriggered = false;
+          return;
         }
       }
     });
@@ -477,7 +579,7 @@ document.querySelectorAll("canvas").forEach(canvas => {
     });
 
     canvas.addEventListener('pointerup', e => {
-      canvas.releasePointerCapture(e.pointerId); // 鎖定指標
+      canvas.releasePointerCapture(e.pointerId); // 釋放指標
       console.log(new Date().toLocaleString(), 'pointerup and releasePointerCapture');
       clearTimeout(longPressTimer);
       if (!isPointerDown) return;
