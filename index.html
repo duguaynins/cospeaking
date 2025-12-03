@@ -253,12 +253,14 @@
               <button id="nextAllBtn">⏭️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Next</p></button>
               <button id="speakBtn">▶️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Play</p></button>
               <button id="stopBtn">⏸️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Stop</p></button>
-              <button id="switchBtn">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Switch</p></button>
+
+              <button id="switchBtn" disabled="">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Switch</p></button>
+              <button id="fullscreenBtn" disabled="">🖵<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">fullscreen</p></button>
           </div>
           <input class="" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: none;"/>
           
           <!-- 放置你原有的布局 -->
-          <!--strong>⏮️⏭️▶️⏸️</strong-->
+          <!--strong>⏮️⏭️▶️⏸️💬👀🖵</strong-->
           <div style="background: #FF3B00; color: white;" translate="yes">
           <div style="margin: 10px;" onclick="document.getElementById('DialogTool').showModal()">
           By sending a message to this service, it means you have agreed to any content and all content!
@@ -302,9 +304,11 @@ console.log = function(...args) {
 });
 
 // 測試
-console.log(new Date().toLocaleString(), 'v1.20251203.1315');
-console.log(new Date().toLocaleString(), 'This is a log test.');
-console.error(new Date().toLocaleString(), 'This is an error test.');
+const version = (new Date().toLocaleString(), 'v1.20251203.1315 (This is an error test.)');
+console.error(version);
+console.warn(version);
+console.info(version);
+console.log(version);
 </script>
 <!-- LOG ================================================== -->
     
@@ -335,29 +339,27 @@ document.getElementById('switchBtn').addEventListener('click', () => {
 
 // 控制方法統一
 function contrlRight() {
-    console.log("⏭️");
     if(!pdfDoc) return;
     if (currentPage === totalPages) {
       console.log("Already on the last page");
       return;  // 頁面語音同步
     }
     ///if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
-    console.log(currentPage);
+    console.log("⏭️", currentPage, currentPage+1);
     goToPage(currentPage + 1);
-    console.log(currentPage);
     
     if(lines.length===0) return;
     currentIndex = (currentIndex +1) % lines.length;
     txt.value = lines[currentIndex];
 }
 function contrlLeft() {
-    console.log("⏮️");
     if(!pdfDoc) return;
     if (currentPage === 1) {
       console.log("Already on the first page");
       return;  // 頁面語音同步
     }
     ///if(currentPage > 1){ currentPage--; renderPage(currentPage); }
+    console.log("⏮️", currentPage, currentPage-1);
     goToPage(currentPage - 1);
     
     if(lines.length===0) return;
@@ -573,6 +575,18 @@ document.querySelectorAll("canvas").forEach(canvas => {
     });
 });
 
+
+document.getElementById('fullscreenBtn').addEventListener('click', () => {
+  const canvas = document.getElementById('pdfCanvas');
+  if (canvas.requestFullscreen) {
+    canvas.requestFullscreen();
+  } else if (canvas.webkitRequestFullscreen) { /* Safari */
+    canvas.webkitRequestFullscreen();
+  } else if (canvas.msRequestFullscreen) { /* IE/Edge */
+    canvas.msRequestFullscreen();
+  }
+});
+/*
 document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
   canvas.addEventListener("click", async () => {
     // 若尚未進入全螢幕 → 請求全螢幕
@@ -595,7 +609,7 @@ document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
       ///downloadPNG(canvas);
     }
   });
-});
+}); */
 </script>
 
 
@@ -612,6 +626,7 @@ let currentIndex = 0;
 // 讀取 TXT
 fileInputTxt.addEventListener('change', e=>{
   document.getElementById('fileInputTxtRow').style.display = "none";
+  document.getElementById('switchBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
   if(!file) return;
@@ -672,6 +687,7 @@ const renderPage = async (num)=>{
 
 fileInputPdf.addEventListener('change', e=>{
   document.getElementById('fileInputPdfRow').style.display = "none";
+  document.getElementById('fullscreenBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
   if(!file) return;
@@ -767,7 +783,7 @@ const debouncedRenderPage = (num) => {
   if (renderTimer) clearTimeout(renderTimer);
   renderTimer = setTimeout(() => {
     renderPageWithCancel(num);
-  }, 200);  // 100~500ms
+  }, 520);  // 100~500ms
 };
 
 // 將頁碼更新獨立
