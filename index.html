@@ -202,7 +202,7 @@
           nins/cospeaking
           </div></div>
           <!-- 放置你原有的布局 -->
-          <input type="range" id="rateSlider" min="0.5" max="2.0" step="0.1" value="1.5" style="width: 100vw; box-sizing: border-box; padding: 0; margin: 0;">
+          <input type="range" id="rateSlider" min="0.5" max="2.0" step="0.1" value="1.2" style="width: 100vw; box-sizing: border-box; padding: 0; margin: 0;">
           <select translate="no" id="voiceSelect" style="width: 100vw;"></select>
 
           <div id="content" style="background: #FFFFFF; width: 100%; flex:1; border: 1px solid #ccc;">
@@ -337,7 +337,14 @@ document.getElementById('switchBtn').addEventListener('click', () => {
 function contrlRight() {
     console.log("⏭️");
     if(!pdfDoc) return;
-    if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
+    if (currentPage === totalPages) {
+      console.log("Already on the last page");
+      return;  // 頁面語音同步
+    }
+    ///if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
+    console.log(currentPage);
+    goToPage(currentPage + 1);
+    console.log(currentPage);
     
     if(lines.length===0) return;
     currentIndex = (currentIndex +1) % lines.length;
@@ -346,7 +353,12 @@ function contrlRight() {
 function contrlLeft() {
     console.log("⏮️");
     if(!pdfDoc) return;
-    if(currentPage > 1){ currentPage--; renderPage(currentPage); }
+    if (currentPage === 1) {
+      console.log("Already on the first page");
+      return;  // 頁面語音同步
+    }
+    ///if(currentPage > 1){ currentPage--; renderPage(currentPage); }
+    goToPage(currentPage - 1);
     
     if(lines.length===0) return;
     currentIndex = (currentIndex -1 + lines.length) % lines.length;
@@ -420,33 +432,17 @@ window.addEventListener('keydown', e => {
   ///updateCarousel();
 });
 
+// 按鈕控制
+const _playBtn = document.getElementById('speakBtn');
+const _stopBtn = document.getElementById('stopBtn');
+const _prevBtn = document.getElementById('prevAllBtn');
+const _nextBtn = document.getElementById('nextAllBtn');
+_playBtn.addEventListener('click', ()=>{ contrlPlay(); });
+_stopBtn.addEventListener('click', ()=>{ contrlStop(); });
+_prevBtn.addEventListener('click', ()=>{ contrlLeft(); });
+_nextBtn.addEventListener('click', ()=>{ contrlRight(); });
 
-// 鼠標控制  // 棄用此區域
-/*
-function onMove(e) {
-  if(!isPointerDown) return;
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
-  // 這裡判斷上下左右滑動
-}
-function onDown(e) {
-  isPointerDown = true;
-  ///startX = e.clientX;
-  ///startY = e.clientY;
-  longPressTriggered = false;
-  
-  longPressTimer = setTimeout(() => {
-    longPressTriggered = true;
-    contrlLongPress();
-  }, 500); 
-}
-function onUp(e) {
-  isPointerDown = false;
-  clearTimeout(longPressTimer);
-  if(!longPressTriggered){
-    // 判定為 tap 或滑動結束
-  }
-} */
+// 鼠標控制
 function touchLog(e, touchname) {
     for (let i = 0; i < e.touches.length; i++) {
         ///const touch = e.changedTouches[i];   // 剛離開的手指
@@ -454,7 +450,6 @@ function touchLog(e, touchname) {
         console.log(`${touchname} * ${i}: (${touch.clientX}, ${touch.clientY})`);
     }
 }
-// 鼠標控制
 document.querySelectorAll("canvas").forEach(canvas => {
     let startX = 0;
     let startY = 0;
@@ -576,66 +571,6 @@ document.querySelectorAll("canvas").forEach(canvas => {
         }
       }
     });
-
-    /*
-    canvas.addEventListener('pointerdown', e => {
-      canvas.setPointerCapture(e.pointerId); // 鎖定指標
-      console.log(new Date().toLocaleString(), 'pointerdown and setPointerCapture');
-      isPointerDown = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      longPressTriggered = false;
-
-      longPressTimer = setTimeout(() => {
-        longPressTriggered = true;
-        contrlLongPress();
-      }, 500); // 長按時間
-    });
-
-    canvas.addEventListener('pointerup', e => {
-      canvas.releasePointerCapture(e.pointerId); // 釋放指標
-      console.log(new Date().toLocaleString(), 'pointerup and releasePointerCapture');
-      clearTimeout(longPressTimer);
-      if (!isPointerDown) return;
-      isPointerDown = false;
-
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
-      const absX = Math.abs(dx);
-      const absY = Math.abs(dy);
-      ///const threshold = 50; // 滑動需要的最小距離
-      const threshold = canvas.clientWidth * 0.05; // 10% 的畫布寬度
-
-      // 若已經觸發長按，不再判定滑動或點擊
-      if (longPressTriggered) return;
-
-      //點擊
-      if(absX < 10 && absY < 10){
-        contrlTap();
-        return;
-      }
-
-      //水平滑動
-      if(absX > absY && absX > threshold){
-        if(dx > 0){
-          contrlLeft();
-        } else {
-          contrlRight();
-        }
-        return;
-      }
-
-      //垂直滑動
-      if(absY > absX && absY > threshold){
-        if(dy > 0){
-          contrlPlay();///contrlDown();
-        } else {
-          contrlPlay();///contrlUp();
-        }
-        return;
-      }
-    }); */
 });
 
 document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
@@ -661,36 +596,6 @@ document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
     }
   });
 });
-/*
-// 其他控制
-document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
-  // 手機觸控
-  canvas.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-  });
-  canvas.addEventListener('touchend', e => {
-    let delta = e.changedTouches[0].clientX - startX;
-    if (delta > 50) currentIndex = Math.max(0, currentIndex - 1);
-    if (delta < -50) currentIndex = Math.min(canvases.length-1, currentIndex + 1);
-    updateCarousel();
-  });
-  // 電腦滑鼠拖動
-  canvas.addEventListener('mousedown', e => {
-    isDragging = true;
-    startX = e.clientX;
-  });
-  canvas.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-  });
-  canvas.addEventListener('mouseup', e => {
-    if (!isDragging) return;
-    let delta = e.clientX - startX;
-    if (delta > 50) currentIndex = Math.max(0, currentIndex - 1);
-    if (delta < -50) currentIndex = Math.min(canvases.length-1, currentIndex + 1);
-    updateCarousel();
-    isDragging = false;
-  });
-}); */
 </script>
 
 
@@ -719,6 +624,7 @@ fileInputTxt.addEventListener('change', e=>{
   reader.readAsText(file);
 });
 
+/*
 prevTxtBtn.addEventListener('click', ()=>{
   if(lines.length===0) return;
   currentIndex = (currentIndex -1 + lines.length) % lines.length;
@@ -729,7 +635,7 @@ nextTxtBtn.addEventListener('click', ()=>{
   if(lines.length===0) return;
   currentIndex = (currentIndex +1) % lines.length;
   txt.value = lines[currentIndex];
-});
+});  */
 
 
 </script>
@@ -759,7 +665,7 @@ const renderPage = async (num)=>{
   await page.render(renderCtx).promise;
   pageInfo.textContent = `頁面 ${num} / ${totalPages}`;
   ///pdfCanvas.style.border = "1px solid black";
-  pageInfo.style.display = "none";
+  ///pageInfo.style.display = "none";
   pdfCanvas.style.border = "1px solid #cdcdcd";
   pdfCanvas.style.display = "block";
 };
@@ -780,6 +686,7 @@ fileInputPdf.addEventListener('change', e=>{
   reader.readAsArrayBuffer(file);
 });
 
+/*
 prevPdfBtn.addEventListener('click', ()=>{
   if(!pdfDoc) return;
   if(currentPage > 1){ currentPage--; renderPage(currentPage); }
@@ -788,8 +695,101 @@ prevPdfBtn.addEventListener('click', ()=>{
 nextPdfBtn.addEventListener('click', ()=>{
   if(!pdfDoc) return;
   if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
+}); */
+
+/*
+let renderTimer = null; // 防抖計時器
+
+const debouncedRenderPage = (num) => {
+  if (renderTimer) clearTimeout(renderTimer);
+  renderTimer = setTimeout(() => {
+    renderPage(num);
+  }, 500); // 500ms 等待穩定後渲染
+};
+
+// 改造上一頁、下一頁按鈕事件
+prevPdfBtn.addEventListener('click', ()=>{
+  if(!pdfDoc) return;
+  if(currentPage > 1){ 
+    currentPage--; 
+    debouncedRenderPage(currentPage);
+  }
 });
 
+nextPdfBtn.addEventListener('click', ()=>{
+  if(!pdfDoc) return;
+  if(currentPage < totalPages){ 
+    currentPage++; 
+    debouncedRenderPage(currentPage);
+  }
+}); */
+
+let renderTimer = null;   // 防抖計時器
+let currentRenderTask = null; // 追蹤當前渲染任務
+
+const renderPageWithCancel = async (num) => {
+  if (!pdfDoc) return;
+
+  // 如果上一個渲染還在進行，先取消
+  if (currentRenderTask) {
+    ///currentRenderTask.cancel();
+    try {
+      await currentRenderTask.cancel();  // 等待異部完成
+    } catch (err) {
+      if (err?.name !== 'RenderingCancelledException') console.error(err);
+    }
+    currentRenderTask = null;
+  }
+
+  const page = await pdfDoc.getPage(num);
+  const viewport = page.getViewport({ scale: 1.5 });
+  pdfCanvas.height = viewport.height;
+  pdfCanvas.width = viewport.width;
+
+  const renderCtx = {
+    canvasContext: pdfCanvas.getContext('2d'),
+    viewport
+  };
+
+
+  // 開始渲染
+  currentRenderTask = page.render(renderCtx);
+  try {
+    await currentRenderTask.promise;
+  } catch (err) {
+    if (err?.name !== 'RenderingCancelledException') console.error(err);
+  } finally {
+    currentRenderTask = null;
+  }
+};
+
+const debouncedRenderPage = (num) => {
+  if (renderTimer) clearTimeout(renderTimer);
+  renderTimer = setTimeout(() => {
+    renderPageWithCancel(num);
+  }, 200);  // 100~500ms
+};
+
+// 將頁碼更新獨立
+const goToPage = (num) => {
+  if (!pdfDoc) return;
+  if (num < 1) num = 1;
+  if (num > totalPages) num = totalPages;
+  currentPage = num;
+
+  // 頁碼先更新
+  pageInfo.textContent = `頁面 ${currentPage} / ${totalPages}`;
+  pageInfo.style.display = "block";
+
+  // 再渲染
+  debouncedRenderPage(currentPage);
+};
+
+/*
+// 上一頁
+prevPdfBtn.addEventListener('click', () => goToPage(currentPage - 1));
+// 下一頁
+nextPdfBtn.addEventListener('click', () => goToPage(currentPage + 1)); */
 </script>
 
 
@@ -842,6 +842,7 @@ const speakBtn = document.getElementById('speakBtn');
 const stopBtn = document.getElementById('stopBtn');
 let currentUtter = null;
 
+/*
 speakBtn.addEventListener('click', ()=>{
   if (true) {
     let text = txt.value.trim();
@@ -887,7 +888,7 @@ speakBtn.addEventListener('click', ()=>{
 
 stopBtn.addEventListener('click', ()=>{
   if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-});
+}); */
 </script>
     <!-- 放置你原有的布局 -->
 
