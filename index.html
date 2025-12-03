@@ -423,12 +423,45 @@ document.querySelectorAll("canvas").forEach(canvas => {
       }
     });
     
-    canvas.addEventListener('pointerdown', e => console.log('pointerdown'));
-    canvas.addEventListener('pointerup', e => console.log('pointerup'));
-    canvas.addEventListener('pointermove', e => console.log('pointermove'));
     canvas.addEventListener('touchstart', e => console.log('touchstart'));
     canvas.addEventListener('touchend', e => console.log('touchend'));
+    canvas.addEventListener('pointerdown', e => console.log('pointerdown'));
+    canvas.addEventListener('pointerup', e => console.log('pointerup'));
+    ///canvas.addEventListener('pointermove', e => console.log('pointermove'));
 
+    canvas.addEventListener('pointermove', e => {
+      if(!isPointerDown) return; // 必須按住
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+      const threshold = 10; // 避免輕微抖動被判斷為滑動
+
+      // 水平滑動
+      if(absX > absY && absX > threshold){
+        if(dx > 0){
+          console.log("向右滑動", dx);contrlLeft();
+          // 可呼叫 contrlRight()
+        } else {
+          console.log("向左滑動", dx);contrlRight();
+          // 可呼叫 contrlLeft()
+        }
+      }
+
+      // 垂直滑動
+      else if(absY > absX && absY > threshold){
+        if(dy > 0){
+          console.log("向下滑動", dy);contrlPlay();
+          // 可呼叫 contrlDown()
+        } else {
+          console.log("向上滑動", dy);contrlPlay();
+          // 可呼叫 contrlUp()
+        }
+      }
+    });
+
+    /*
     canvas.addEventListener('pointerdown', e => {
       canvas.setPointerCapture(e.pointerId); // 鎖定指標
       console.log(new Date().toLocaleString(), 'pointerdown and setPointerCapture');
@@ -486,7 +519,7 @@ document.querySelectorAll("canvas").forEach(canvas => {
         }
         return;
       }
-    });
+    }); */
 });
 
 document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
