@@ -190,7 +190,7 @@
       flex-direction: column;
     ">
           <div style="background: #FFFFFF; color: black;" translate="no">
-          <div style="height: 2vh; margin: 10px;" onclick="document.getElementById('DialogCheck').showModal()">
+          <div style="height: 2vh; margin: 10px;" onclick="document.getElementById('DialogCheck').showModal();console.log(new Date().toLocaleString(), '🙉');">
           nins/cospeaking
           </div></div>
           <!-- 放置你原有的布局 -->
@@ -247,7 +247,8 @@
     
     <dialog id="DialogCheck" translate="no">
         <pre id="logOutput" style="max-height:200px; overflow:auto; margin:0;"></pre>
-        <button id="openLog" onclick="document.getElementById('DialogCheck').close();console.log('❌');">❌</button>
+        <br>
+        <button id="openLog" style="width: 100%;" onclick="document.getElementById('DialogCheck').close();console.log(new Date().toLocaleString(), '🙈');">❌</button>
 
     </dialog>
 <!-- HTML ================================================== -->
@@ -281,8 +282,8 @@ console.log = function(...args) {
 });
 
 // 測試
-console.log('This is a log test.');
-console.error('This is an error test.');
+console.log(new Date().toLocaleString(), 'This is a log test.');
+console.error(new Date().toLocaleString(), 'This is an error test.');
 </script>
 <!-- LOG ================================================== -->
     
@@ -337,20 +338,27 @@ window.addEventListener('keydown', e => {
       return;
     }
     if('speechSynthesis' in window){
-      if(speechSynthesis.speaking) speechSynthesis.cancel();
-      else {
-        currentUtter = new SpeechSynthesisUtterance(text);
-        currentUtter.rate = document.getElementById('rateSlider').value || 2;
+      if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      
+      const voice = voices[parseInt(voiceSelect.value)];  ///???
+      ///currentUtter = new SpeechSynthesisUtterance(text);
+      const msg = new window.SpeechSynthesisUtterance();
+      msg.text = text;
+      msg.lang = voice.lang;           // 語言代碼
+      msg.rate = document.getElementById('rateSlider').value || 2;
+      ///msg.volume = 1;                // 音量 0~1
+      ///msg.pitch = 1;                 // 音高 0~2
+      ///msg.voice = voice;
 
-        ///const selectedVoice = voices[voiceSelect.value];  ///???
-        const selectedVoice = voices[parseInt(voiceSelect.value)];  ///???
-        if (selectedVoice) { currentUtter.voice = selectedVoice; }  ///???
-        console.log(selectedVoice);
+      ///const voice = voices[voiceSelect.value];  ///???
+      ///const voice = voices[parseInt(voiceSelect.value)];  ///???
+      ///if (voice) { msg.voice = voice; }  ///???
 
-        currentUtter.onend = ()=> console.log('播放結束');
-        currentUtter.onerror = e=> console.error('播放錯誤', e);
-        speechSynthesis.speak(currentUtter);
-      }
+      console.log(new Date().toLocaleString(), voice);
+
+      msg.onend = ()=> console.log(new Date().toLocaleString(), '播放結束');
+      msg.onerror = e=> console.error(new Date().toLocaleString(), '播放錯誤', e);
+      window.speechSynthesis.speak(msg);
     } else {
       alert('瀏覽器不支援 Web Speech API');
     }
@@ -371,7 +379,7 @@ document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
           screen.orientation.lock("landscape").catch(() => {});
         }
       } catch (e) {
-        console.log(e);
+        console.log(new Date().toLocaleString(), e);
       }
     } else {
       // 若已在全螢幕 → 退出
@@ -561,35 +569,37 @@ const stopBtn = document.getElementById('stopBtn');
 let currentUtter = null;
 
 speakBtn.addEventListener('click', ()=>{
-  let text = txt.value.trim();
-  if(!text && pdfDoc){
-    alert('請先選擇文字或輸入要讀的文字。');
-    return;
-  }
-  if('speechSynthesis' in window){
-    if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-    
-    const voice = voices[parseInt(voiceSelect.value)];  ///???
-    ///currentUtter = new SpeechSynthesisUtterance(text);
-    const msg = new window.SpeechSynthesisUtterance();
-    msg.text = text;
-    msg.lang = voice.lang;           // 語言代碼
-    msg.rate = document.getElementById('rateSlider').value || 2;
-    ///msg.volume = 1;                // 音量 0~1
-    ///msg.pitch = 1;                 // 音高 0~2
-    ///msg.voice = voice;
+  if (true) {
+    let text = txt.value.trim();
+    if(!text && pdfDoc){
+      alert('請先選擇文字或輸入要讀的文字。');
+      return;
+    }
+    if('speechSynthesis' in window){
+      if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      
+      const voice = voices[parseInt(voiceSelect.value)];  ///???
+      ///currentUtter = new SpeechSynthesisUtterance(text);
+      const msg = new window.SpeechSynthesisUtterance();
+      msg.text = text;
+      msg.lang = voice.lang;           // 語言代碼
+      msg.rate = document.getElementById('rateSlider').value || 2;
+      ///msg.volume = 1;                // 音量 0~1
+      ///msg.pitch = 1;                 // 音高 0~2
+      ///msg.voice = voice;
 
-    ///const voice = voices[voiceSelect.value];  ///???
-    ///const voice = voices[parseInt(voiceSelect.value)];  ///???
-    ///if (voice) { msg.voice = voice; }  ///???
+      ///const voice = voices[voiceSelect.value];  ///???
+      ///const voice = voices[parseInt(voiceSelect.value)];  ///???
+      ///if (voice) { msg.voice = voice; }  ///???
 
-    console.log(voice);
+      console.log(new Date().toLocaleString(), voice);
 
-    msg.onend = ()=> console.log('播放結束');
-    msg.onerror = e=> console.error('播放錯誤', e);
-    window.speechSynthesis.speak(msg);
-  } else {
-    alert('瀏覽器不支援 Web Speech API');
+      msg.onend = ()=> console.log(new Date().toLocaleString(), '播放結束');
+      msg.onerror = e=> console.error(new Date().toLocaleString(), '播放錯誤', e);
+      window.speechSynthesis.speak(msg);
+    } else {
+      alert('瀏覽器不支援 Web Speech API');
+    }
   }
 });
 
