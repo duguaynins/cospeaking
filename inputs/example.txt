@@ -1,6 +1,6 @@
 01 *** PDF PAGE START ***
-02
-03 這裡是空白頁，耶。這是測試檔案，沒錯。
+02 這裡是空白頁，耶。這是測試檔案，沒錯。
+03
 04 Please enter the text to convert to speech, along with the corresponding page number.
 05 請輸入要轉換成語音的文字，並且對應頁數。
 06 音声に変換するテキストと対応するページ番号を入力してください。
