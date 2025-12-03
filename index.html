@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head translate="yes">
@@ -218,8 +219,7 @@
     <h1 translate="no" style="margin: 0;">© 2024 NINS. 👻</h1>
     <p translate="no" style="margin: 0; color: red;">(by JPGT)</p>
     <!--p>📌 I will accompany you during your speak. 🕛</p-->
-    <!--p><span translate="no"> 📌 </span>I will accompany you, whether you are speaking.</p-->
-    <p><span translate="no"> 📌 </span>I will accompany you onto the stage, whether you are speaking or not.</p>
+    <p><span translate="no"> 📌 </span>I will accompany you, whether you are speaking.</p>
     <!--p>💡 Each line of the text file will be compiled into a playlist.</p-->
     <p><span translate="no"> 💡 </span>Each line in the text file will be compiled individually, and then merged into a single playlist.</p>
     <p><span translate="no"> 💡 </span>If you don’t know how to use it, just press all the buttons once and it will work!</p>
@@ -333,32 +333,23 @@ document.getElementById('switchBtn').addEventListener('click', () => {
 });
 
 // 鍵盤控制
-window.addEventListener('keydown', e => {
-  ///if (e.code === 'Space') {  }
-  if (e.key === 'ArrowRight') {
-      if(!pdfDoc) return;
-      if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
-      
-      if(lines.length===0) return;
-      currentIndex = (currentIndex +1) % lines.length;
-      txt.value = lines[currentIndex];
-  };
-  if (e.key === 'ArrowLeft') {
-      if(!pdfDoc) return;
-      if(currentPage > 1){ currentPage--; renderPage(currentPage); }
-      
-      if(lines.length===0) return;
-      currentIndex = (currentIndex -1 + lines.length) % lines.length;
-      txt.value = lines[currentIndex];
-  }
-  if (e.ctrlKey) { 
-    if('speechSynthesis' in window){
-      if(window.speechSynthesis.speaking) window.speechSynthesis.cancel(); 
-    } else {
-      ///alert('瀏覽器不支援 Web Speech API');
-    }
-  }
-  if (e.key === ' ') { 
+function contrlRight() {
+    if(!pdfDoc) return;
+    if(currentPage < totalPages){ currentPage++; renderPage(currentPage); }
+    
+    if(lines.length===0) return;
+    currentIndex = (currentIndex +1) % lines.length;
+    txt.value = lines[currentIndex];
+}
+function contrlLeft() {
+    if(!pdfDoc) return;
+    if(currentPage > 1){ currentPage--; renderPage(currentPage); }
+    
+    if(lines.length===0) return;
+    currentIndex = (currentIndex -1 + lines.length) % lines.length;
+    txt.value = lines[currentIndex];
+}
+function contrlPlay() {
     let text = txt.value.trim();
     if(!text && pdfDoc){
       ///alert('請先選擇文字或輸入要讀的文字。');
@@ -397,8 +388,93 @@ window.addEventListener('keydown', e => {
     } else {
       ///alert('瀏覽器不支援 Web Speech API');
     }
+}
+
+// 鍵盤控制
+window.addEventListener('keydown', e => {
+  ///if (e.code === 'Space') {  }
+  if (e.key === 'ArrowRight') {
+    contrlRight();
+  };
+  if (e.key === 'ArrowLeft') {
+    contrlLeft();
+  }
+  if (e.key === ' ') { 
+    contrlPlay();
   }
   ///updateCarousel();
+});
+// 鼠標控制
+document.querySelectorAll("canvas").forEach(canvas => {
+    let startX = 0;
+    let startY = 0;
+    let isPointerDown = false;
+    let longPressTimer = null;
+    let longPressTriggered = false;
+
+    canvas.addEventListener('pointerdown', e => {
+      isPointerDown = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      longPressTriggered = false;
+
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        contrlLongPress();
+      }, 500); // 長按時間
+    });
+
+    canvas.addEventListener('pointermove', e => {
+      // 如果移動太多就取消長按
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if(Math.abs(dx) > 10 || Math.abs(dy) > 10){
+        clearTimeout(longPressTimer);
+      }
+    });
+
+    canvas.addEventListener('pointerup', e => {
+      clearTimeout(longPressTimer);
+      if (!isPointerDown) return;
+      isPointerDown = false;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+      ///const threshold = 50; // 滑動需要的最小距離
+      const threshold = canvas.clientWidth * 0.05; // 10% 的畫布寬度
+
+      // 若已經觸發長按，不再判定滑動或點擊
+      if (longPressTriggered) return;
+
+      //點擊
+      if(absX < 10 && absY < 10){
+        contrlTap();
+        return;
+      }
+
+      //水平滑動
+      if(absX > absY && absX > threshold){
+        if(dx > 0){
+          contrlLeft();
+        } else {
+          contrlRight();
+        }
+        return;
+      }
+
+      //垂直滑動
+      if(absY > absX && absY > threshold){
+        if(dy > 0){
+          contrlPlay();///contrlDown();
+        } else {
+          contrlPlay();///contrlUp();
+        }
+        return;
+      }
+    });
 });
 
 document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
@@ -418,7 +494,7 @@ document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
       }
     } else {
       // 若已在全螢幕 → 退出
-      document.exitFullscreen();
+      ///document.exitFullscreen();  ///!!!
       ///canvas.style.background = "transparent"; // ← 退出後恢復
       ///downloadPNG(canvas);
     }
