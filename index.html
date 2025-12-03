@@ -447,7 +447,13 @@ function onUp(e) {
     // 判定為 tap 或滑動結束
   }
 } */
-
+function touchLog(e, touchname) {
+    for (let i = 0; i < e.touches.length; i++) {
+        ///const touch = e.changedTouches[i];   // 剛離開的手指
+        const touch = e.touches[i]; // 螢幕上剩下的手指
+        console.log(`${touchname} * ${i}: (${touch.clientX}, ${touch.clientY})`);
+    }
+}
 // 鼠標控制
 document.querySelectorAll("canvas").forEach(canvas => {
     let startX = 0;
@@ -468,7 +474,14 @@ document.querySelectorAll("canvas").forEach(canvas => {
     
     canvas.addEventListener('touchstart', e => console.log('touchstart'));
     canvas.addEventListener('touchend', e => console.log('touchend'));
-    canvas.addEventListener('touchmove', (e) => console.log('touchmove'));
+    ///canvas.addEventListener('touchmove', (e) => console.log('touchmove'));
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // 阻止頁面滾動
+        touchLog(e, "touchmove");
+    });
+
+
+
     ///canvas.addEventListener('pointerdown', e => console.log('pointerdown'));
     ///canvas.addEventListener('pointerup', e => console.log('pointerup'));
     ///canvas.addEventListener('pointermove', e => console.log('pointermove'));
