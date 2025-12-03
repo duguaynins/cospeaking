@@ -239,8 +239,10 @@
 
           <!--input type="file" id="fileInputPdf" accept=".pdf" style="display:none;"-->
           <!--input type="file" id="fileInputTxt" accept=".txt" style="display:none;"-->
-          <input type="file" id="fileInputPdf" accept="application/pdf" style="display:none;">
-          <input type="file" id="fileInputTxt" accept="text/plain" style="display:none;">
+          <!--input type="file" id="fileInputPdf" accept="application/pdf" style="display:none;"-->
+          <!--input type="file" id="fileInputTxt" accept="text/plain" style="display:none;"-->
+          <input type="file" id="fileInputPdf" accept="" style="display:none;">
+          <input type="file" id="fileInputTxt" accept="" style="display:none;">
 
 
           <div class="hotkey" translate="no" style="display: flex; margin: 0vw; display: flex; flex-direction: row; border: 2px solid #cdcdcd; animation: hardBlink 1.0s steps(1, start) infinite;" translate="no">
@@ -632,7 +634,10 @@ fileInputTxt.addEventListener('change', e=>{
   document.getElementById('switchinputBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
-  if(!file) return;
+  ///if(!file) return;
+  if (!e.target.files || e.target.files.length === 0) { console.log("file0");window.open("https://cospeaking.nins.cc/inputs/example.txt", "_blank", "noopener,noreferrer");return; }
+  if (file.type !== 'text/plain') { setTimeout(() => { window.open("https://cospeaking.nins.cc/inputs/example.txt", "_blank", "noopener,noreferrer"); }, 100);  }
+  
   const reader = new FileReader();
   reader.onload = (event)=>{
     lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
@@ -695,7 +700,10 @@ fileInputPdf.addEventListener('change', e=>{
   document.getElementById('fullscreenBtn').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
-  if(!file) return;
+  ///if(!file) return;
+  if (!e.target.files || e.target.files.length === 0) { console.log("file0");window.open("https://cospeaking.nins.cc/inputs/example.pdf", "_blank", "noopener,noreferrer");return; }
+  if (file.type !== 'application/pdf') { setTimeout(() => { window.open("https://cospeaking.nins.cc/inputs/example.pdf", "_blank", "noopener,noreferrer"); }, 100);  }
+  
   const reader = new FileReader();
   reader.onload = async (event)=>{
     const typedarray = new Uint8Array(event.target.result);
