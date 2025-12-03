@@ -858,8 +858,9 @@ function loadVoices() {
   // 設定預設語音
   const language = languageRegion(navigator.language || navigator.userLanguage || "en-US");  // 閱讀母語
   const defaultVoice = voices.find(v => v.lang === language) || 
-                       voices.find(v => v.lang === language.replace(/-/g, "_")) || 
-                       voices.find(v => v.lang.startsWith(language.slice(0, 2)));
+                       voices.find(v => v.lang.startsWith( language.replace(/_/g, "-") )) || // zh-TW
+                       voices.find(v => v.lang.startsWith( language.replace(/-/g, "_") )) || // zh_TW
+                       voices.find(v => v.lang.startsWith( language.slice(0, 2) ));
   
   if (defaultVoice) {
     const index = voices.indexOf(defaultVoice);
