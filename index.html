@@ -254,8 +254,8 @@
               <button id="speakBtn">▶️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Play</p></button>
               <button id="stopBtn">⏸️<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Stop</p></button>
 
-              <button id="switchBtn" disabled="">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">Switch</p></button>
-              <button id="fullscreenBtn" disabled="">🖵<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">fullscreen</p></button>
+              <button id="switchinputBtn" disabled="">💬<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">switchinput</p></button>
+              <button id="fullscreenBtn" disabled="">👀<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">fullscreen</p></button>
           </div>
           <input class="" id="txt" type="text" name="noMemory" autocomplete="off" placeholder="After uploading two files, start!" style="width: 100%; text-align: center; display: none;"/>
           
@@ -329,7 +329,7 @@ let startX = 0;
 let isDragging = false;
 
 // 收放輸入框
-document.getElementById('switchBtn').addEventListener('click', () => {
+document.getElementById('switchinput').addEventListener('click', () => {
   if (document.getElementById('txt').style.display === 'none') {
     document.getElementById('txt').style.display = 'block'; // 顯示元素
   } else {
@@ -578,6 +578,9 @@ document.querySelectorAll("canvas").forEach(canvas => {
 
 document.getElementById('fullscreenBtn').addEventListener('click', () => {
   const canvas = document.getElementById('pdfCanvas');
+  if (!document.fullscreenElement) { canvas.style.background = "black"; }
+  else { canvas.style.background = "transparent"; }
+
   if (canvas.requestFullscreen) {
     canvas.requestFullscreen();
   } else if (canvas.webkitRequestFullscreen) { /* Safari */
@@ -587,7 +590,7 @@ document.getElementById('fullscreenBtn').addEventListener('click', () => {
   }
 });
 /*
-document.querySelectorAll("canvas").forEach(canvas => {  // 論巡
+document.querySelectorAll("canvas").forEach(canvas => {  // 論巡 
   canvas.addEventListener("click", async () => {
     // 若尚未進入全螢幕 → 請求全螢幕
     if (!document.fullscreenElement) {
@@ -626,7 +629,7 @@ let currentIndex = 0;
 // 讀取 TXT
 fileInputTxt.addEventListener('change', e=>{
   document.getElementById('fileInputTxtRow').style.display = "none";
-  document.getElementById('switchBtn').disabled  = false;  // 取消禁用元素
+  document.getElementById('switchinput').disabled  = false;  // 取消禁用元素
 
   const file = e.target.files[0];
   if(!file) return;
@@ -678,7 +681,9 @@ const renderPage = async (num)=>{
     viewport
   };
   await page.render(renderCtx).promise;
-  pageInfo.textContent = `頁面 ${num} / ${totalPages}`;
+  pageInfo.setAttribute("translate", "no");
+  pageInfo.textContent = `${num} / ${totalPages}`;
+  pageInfo.style.display = "block";
   ///pdfCanvas.style.border = "1px solid black";
   ///pageInfo.style.display = "none";
   pdfCanvas.style.border = "1px solid #cdcdcd";
@@ -794,7 +799,8 @@ const goToPage = (num) => {
   currentPage = num;
 
   // 頁碼先更新
-  pageInfo.textContent = `頁面 ${currentPage} / ${totalPages}`;
+  pageInfo.setAttribute("translate", "no");
+  pageInfo.textContent = `${currentPage} / ${totalPages}`;
   pageInfo.style.display = "block";
 
   // 再渲染
