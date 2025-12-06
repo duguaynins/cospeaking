@@ -325,6 +325,41 @@ console.log(version);
     <!-- 放置你原有的布局 -->
 
 <script>
+document.getElementById('fileInputPdf').addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function() {
+    const typedarray = new Uint8Array(this.result);
+    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+    let resultText = '';
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(' ').trim();
+      
+      // 加上頁碼格式 [01], [02], ...
+      const pageNumber = String(i).padStart(2, '0');
+      resultText += `[${pageNumber}]　${pageText}\n\n`;
+    }
+
+    // 自動下載 TXT
+    const blob = new Blob([resultText], {type: 'text/plain;charset=utf-8'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = file.name.replace(/\.pdf$/i, '.txt');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  };
+  reader.readAsArrayBuffer(file);
+});
+</script>
+
+<script>
 /* --- TOUCH 功能 --- */
 // 全螢幕畫布
 const carousel = document.getElementById('pdfCanvas');
