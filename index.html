@@ -340,8 +340,9 @@ document.getElementById('fileInputPdf').addEventListener('change', async (event)
       const content = await page.getTextContent();
       const pageText = content.items.map(item => item.str).join(' ').trim();
       
-      // 加上頁碼格式 [01], [02], ...
-      const pageNumber = String(i).padStart(2, '0');
+      // 加上頁碼格式
+      ///const pageNumber = String(i).padStart(2, '0');  ///01~99
+      const pageNumber = String(i).padStart(2, '0');  ///001~999
       resultText += `[${pageNumber}]　${pageText}\n\n`;
     }
 
