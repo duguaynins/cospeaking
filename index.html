@@ -202,9 +202,11 @@
           nins/cospeaking
           </div></div>
           <!-- 放置你原有的布局 -->
+          <select translate="no" id="voiceSelect" style="width: 100vw; display: none;"></select>
+          <select translate="no" id="voiceSelect1" style="width: 100vw; background-color: orange;"></select>
+          <select translate="no" id="voiceSelect2" style="width: 100vw; background-color: yellow;"></select>
           <input type="range" id="rateSlider" min="0.5" max="2.0" step="0.1" value="1.2" style="width: 100vw; box-sizing: border-box; padding: 0; margin: 0;">
-          <select translate="no" id="voiceSelect" style="width: 100vw;"></select>
-
+          
           <div id="content" style="background: #FFFFFF; width: 100%; flex:1; border: 1px solid #ccc;">
 
 
@@ -422,16 +424,21 @@ function contrlPlay() {
       return;
     }
     if('speechSynthesis' in window){
+      const voice1 = voices[parseInt(document.getElementById('voiceSelect1').value)];
+      const voice2 = voices[parseInt(document.getElementById('voiceSelect2').value)];
+
       if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-      let pitch = 1.0;if (currentPage % 2 === 0) { pitch = 0.2; } else { pitch = 1.2; }
-      let volume = 1.0;if (currentPage % 2 === 0) { volume = 0.6; } else { volume = 1.0; }
+      let lang = 1.0; if (currentPage % 2 === 0) { lang = voice2.lang; } else { lang = voice1.lang; }
+      let pitch = 1.0; if (currentPage % 2 === 0) { pitch = 0.8; } else { pitch = 1.3; }
+      let rate = 1.0; if (currentPage % 2 === 0) { rate = 0.9; } else { rate = 1.2; }
+      let volume = 1.0; if (currentPage % 2 === 0) { volume = 0.7; } else { volume = 1.0; }
       
       const voice = voices[parseInt(voiceSelect.value)];  ///???
       ///currentUtter = new SpeechSynthesisUtterance(text);
       const msg = new window.SpeechSynthesisUtterance();
-      msg.text = text.split('▶️')[1];  // text;
-      msg.lang = voice.lang;           // 語言代碼
       msg.rate = document.getElementById('rateSlider').value || 2;
+      msg.text = text.split('▶️')[1];  // text;
+      msg.lang = lang;           // 語言代碼
       ///msg.volume = volume;              // 音量 0~1
       ///msg.pitch = pitch;                // 音高 0~2
       ///msg.voice = voice;
@@ -443,8 +450,8 @@ function contrlPlay() {
       ///console.log(new Date().toLocaleString(), voice);                   // 不可列舉，無法這樣顯示***
       ///console.log(new Date().toLocaleString(), JSON.stringify(voice));   // 不可列舉，無法這樣顯示***
       console.log(new Date().toLocaleString(),   {
-        name: voice.name,
-        lang: voice.lang,
+        name: name,  ///voice.name,
+        lang: lang,  ///voice.lang,
         ///voiceURI: voice.voiceURI,
         ///localService: voice.localService,
         ///default: voice.default
@@ -474,6 +481,12 @@ window.addEventListener('keydown', e => {
     ///contrlPlay();
   }
   ///updateCarousel();
+  if (e.key === 'ArrowUp') {
+    contrlPlay();
+  }
+  if (e.key === 'ArrowDown') {
+    contrlStop(); 
+  }
 });
 
 // 按鈕控制
@@ -888,15 +901,32 @@ function languageRegion(tag) {
   return tag; // 只有語言
 }
 
+function addOptionToSelects(voice, selects, index) {
+  selects.forEach(sel => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = `${voice.name} (${voice.lang})`;
+    sel.appendChild(option);
+  });
+}
+
+const selectElements = [
+  document.getElementById('voiceSelect'),
+  document.getElementById('voiceSelect1'),
+  document.getElementById('voiceSelect2')
+]
+
 function loadVoices() {
   voices = speechSynthesis.getVoices();
   voiceSelect.innerHTML = '';
+  voices.forEach((voice, i) => addOptionToSelects(voice, selectElements, i));
+  /*
   voices.forEach((voice, i) => {
     const option = document.createElement('option');
     option.value = i;
     option.textContent = `${voice.name} (${voice.lang})`;
     voiceSelect.appendChild(option);
-  });
+  }); */
   
   // 設定預設語音
   const language = languageRegion(navigator.language || navigator.userLanguage || "en-US");  // 閱讀母語
@@ -909,6 +939,8 @@ function loadVoices() {
   if (defaultVoice) {
     const index = voices.indexOf(defaultVoice);
     voiceSelect.value = index;
+    document.getElementById('voiceSelect1').value = index;
+    document.getElementById('voiceSelect2').value = index;
   }
 }
 
