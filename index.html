@@ -344,7 +344,7 @@ document.getElementById('fileInputPdf').addEventListener('change', async (event)
       ///const pageNumber = String(i).padStart(2, '0');  ///01~99
       ///const pageNumber = String(i).padStart(3, '0');  ///001~999
       const pageNumber = String(i).padStart(4, '0');  ///0001~9999
-      resultText += `[${pageNumber}]　${pageText}\n\n`;
+      resultText += `[${pageNumber}]▶️　${pageText}\n\n`;
     }
 
     // 自動下載 TXT
@@ -429,7 +429,7 @@ function contrlPlay() {
       const voice = voices[parseInt(voiceSelect.value)];  ///???
       ///currentUtter = new SpeechSynthesisUtterance(text);
       const msg = new window.SpeechSynthesisUtterance();
-      msg.text = text;
+      msg.text = text.split('▶️')[1];  // text;
       msg.lang = voice.lang;           // 語言代碼
       msg.rate = document.getElementById('rateSlider').value || 2;
       ///msg.volume = 1;                // 音量 0~1
@@ -684,8 +684,10 @@ fileInputTxt.addEventListener('change', e=>{
   reader.onload = (event)=>{
     lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
     currentIndex = 0;
-    ///txt.value = lines[currentIndex] || '';
-    txt.value = lines[currentIndex].replace(/^\[\d{4}\]\s*/, "") || '';  ///0000~9999
+    txt.value = lines[currentIndex] || '';
+    ///txt.value = lines[currentIndex].replace(/^\[\d{4}\]\s*/, "") || '';  ///0000~9999
+    ///txt.value = text.split('▶️')[1];  // 保留 emoji 之後的內容
+
   };
   reader.readAsText(file);
 });
