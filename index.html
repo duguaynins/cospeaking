@@ -342,7 +342,8 @@ document.getElementById('fileInputPdf').addEventListener('change', async (event)
       
       // 加上頁碼格式
       ///const pageNumber = String(i).padStart(2, '0');  ///01~99
-      const pageNumber = String(i).padStart(2, '0');  ///001~999
+      ///const pageNumber = String(i).padStart(3, '0');  ///001~999
+      const pageNumber = String(i).padStart(4, '0');  ///0001~9999
       resultText += `[${pageNumber}]　${pageText}\n\n`;
     }
 
@@ -680,7 +681,8 @@ fileInputTxt.addEventListener('change', e=>{
   reader.onload = (event)=>{
     lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
     currentIndex = 0;
-    txt.value = lines[currentIndex] || '';
+    ///txt.value = lines[currentIndex] || '';
+    txt.value = lines[currentIndex].replace(/^\[\d{4}\]\s*/, "") || '';  ///0000~9999
   };
   reader.readAsText(file);
 });
