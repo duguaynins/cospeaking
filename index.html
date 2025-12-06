@@ -424,7 +424,7 @@ function contrlPlay() {
     if('speechSynthesis' in window){
       let pitch = 1.0;
       if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-      if (currentPage % 2 === 0) { pitch = 0.5; } else { pitch = 1.0; }
+      if (currentPage % 2 === 0) { pitch = 0.2; } else { pitch = 1.2; }
       
       const voice = voices[parseInt(voiceSelect.value)];  ///???
       ///currentUtter = new SpeechSynthesisUtterance(text);
