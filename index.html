@@ -422,7 +422,9 @@ function contrlPlay() {
       return;
     }
     if('speechSynthesis' in window){
+      let pitch = 1.0;
       if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      if (currentPage % 2 === 0) { pitch = 0.5; } else { pitch = 1.0; }
       
       const voice = voices[parseInt(voiceSelect.value)];  ///???
       ///currentUtter = new SpeechSynthesisUtterance(text);
@@ -432,6 +434,7 @@ function contrlPlay() {
       msg.rate = document.getElementById('rateSlider').value || 2;
       ///msg.volume = 1;                // 音量 0~1
       ///msg.pitch = 1;                 // 音高 0~2
+      msg.pitch = pitch;                // 音高 0~2
       ///msg.voice = voice;
 
       ///const voice = voices[voiceSelect.value];  ///???
