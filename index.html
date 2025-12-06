@@ -682,7 +682,8 @@ fileInputTxt.addEventListener('change', e=>{
 
   const reader = new FileReader();
   reader.onload = (event)=>{
-    lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
+    ///lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='');
+    lines = event.target.result.split(/\r?\n/).filter(line=>line.trim()!=='' && line.includes('▶️'));
     currentIndex = 0;
     txt.value = lines[currentIndex] || '';
     ///txt.value = lines[currentIndex].replace(/^\[\d{4}\]\s*/, "") || '';  ///0000~9999
@@ -900,7 +901,8 @@ function loadVoices() {
   
   // 設定預設語音
   const language = languageRegion(navigator.language || navigator.userLanguage || "en-US");  // 閱讀母語
-  const defaultVoice = voices.find(v => v.lang === language) || 
+  const defaultVoice = voices.find(v => v.lang.startsWith( new URL(window.location.href).searchParams.get("lang")||language )) || 
+                       ///voices.find(v => v.lang === language) || 
                        voices.find(v => v.lang.startsWith( language.replace(/_/g, "-") )) || // zh-TW
                        voices.find(v => v.lang.startsWith( language.replace(/-/g, "_") )) || // zh_TW
                        voices.find(v => v.lang.startsWith( language.slice(0, 2) ));
