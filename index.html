@@ -259,7 +259,7 @@ let rowElements = [];
 texts.forEach((text, index) => {
   const params = new URLSearchParams(window.location.search);
   const source = "auto";
-  const traget = params.get("tl") || 'zh';
+  const traget = params.get("voice") || 'zh';
   const encode = encodeURIComponent(text);
 
   const tts = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${traget}&q=${encode}`;
