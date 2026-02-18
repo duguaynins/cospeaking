@@ -322,7 +322,7 @@ texts.forEach((text, index) => {
     const outputs = await HuggingFaceAPI({
       group: "duguaynins",
       space: "RedirectAPI",
-      path: `tts?text=${encode}&lamg=${traget}`,  ///embeddings/meta
+      path: `tts?text=${encode}&lang=${traget}`,  ///embeddings/meta
       ///payload: inputs,
     }); 
     const blob = await outputs.blob();    
