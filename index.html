@@ -98,12 +98,12 @@
     ">
           <strong id="anything" style="background-color: black; color: white; font-size: max(1vh,1vw);"><b translate="no">© nins. </b>This is pronunciation learning.</strong>
           <div id="title" style="" translate="no">
-          <div style="margin: 10px;" onclick="document.getElementById('DialogCheck').showModal();console.log(new Date().toLocaleString(), '🙉');">
+          <div style="margin: 10px;" onclick="document.getElementById('').showModal();console.log(new Date().toLocaleString(), '🙉');">
           nins/tts
           </div></div>
           
 <!-- 放置你原有的布局 -->
-<button type="button" class="main use fat" onclick="document.getElementById('input_qr').click();">🖼️<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">image</p></button>
+<button type="button" class="x-main x-use fat" onclick="document.getElementById('input_qr').click();" disabled>📚<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">file</p></button>
 <input type="file" id="input_qr" style="display: none;" accept="image/*">
 <canvas id="canvas_qr" style="display:none;"></canvas>
 
@@ -178,11 +178,11 @@
 
 <div class="input-btn-wrapper" style="display: flex; align-items: stretch; width:100%; text-align: center;">
   <!--button type="button" class="main " translate="no" onclick="document.getElementById('input_msg').value='https://';">❤️📄📚📜💡<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">https://</p></button!-->
-  <button type="button" class="main use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
-  <input id="input_msg" class="main use fat" type="text" name="url" autocomplete="off" placeholder="You can use it by clicking the voice button!" style="flex: 1;" list="list_msg"/>
+  <button disabled type="button" class="x-main x-use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
+  <input disabled id="input_msg" class="x-main x-use fat" type="text" name="url" autocomplete="off" placeholder="You can use it by clicking the voice button!" style="flex: 1;" list="list_msg"/>
   <datalist id="list_msg_vt">
   </datalist>
-  <button type="button" class="main use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
+  <button disabled type="button" class="x-main x-use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
 </div>
 
 <button id="input_msgbtn" style="display:none" onclick="send()">Send and Recv</button>
@@ -191,7 +191,7 @@
             
           <!--strong></strong-->
           <div id="notice" style="" translate="yes">
-          <div style="margin: 10px;" onclick="document.getElementById('DialogTrans').showModal()">
+          <div style="margin: 10px;" onclick="document.getElementById('').showModal()">
           By sending a message to this service, it means you have agreed to any content and all content!
           </div></div>
           <strong id="copyright" style="background-color: black; color: white; font-size: max(1vh,1vw);" translate="no">© 2024 NINS (by JPGT).</strong>
@@ -335,7 +335,7 @@ texts.forEach((text, index) => {
 
   };
   btn.textContent = text;
-  btn.className = "btn use";
+  btn.className = "btn use main";
   btn.style.height = "100%";
   container.appendChild(btn);
 
