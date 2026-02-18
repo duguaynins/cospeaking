@@ -317,7 +317,23 @@ texts.forEach((text, index) => {
   const urlm = `https://translate.google.com/m?sl=${source}&tl=${traget}&q=${encode}`;
 
   const btn = document.createElement("button");
-  btn.onclick = () => { window.open(tts, '_blank', 'noopener,noreferrer') };
+  ///btn.onclick = () => { window.open(tts, '_blank', 'noopener,noreferrer') };
+  btn.onclick = async () => {  
+    const outputs = await HuggingFaceAPI({
+      group: "duguaynins",
+      space: "RedirectAPI",
+      path: `tts?text=${encode}&lamg=${traget}`,  ///embeddings/meta
+      ///payload: inputs,
+    }); 
+    const blob = await outputs.blob();    
+    const object = URL.createObjectURL(blob);
+
+    const audio = new Audio(); // ✅ 先建立 audio 物件
+    audio.src = object;
+    audio.play();
+    audio.onended = () => URL.revokeObjectURL(object);  // 播放完釋放資源
+
+  };
   btn.textContent = text;
   btn.className = "btn use";
   btn.style.height = "100%";
@@ -333,6 +349,41 @@ texts.forEach((text, index) => {
     rowElements = []; // 清空暫存
   }
 });
+
+///20260217
+</script>
+
+
+<script>
+async function HuggingFaceAPI(inputs=null) {
+  // 20251205
+  try {
+    console.log(inputs);
+    const { group, space, path, payload } = inputs;
+    const baseUrl = `https://${group}-${space}.hf.space/${path}`;  ///"https://duguaynins-RedirectAPI.hf.space/path";
+
+    const response = await fetch(baseUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    return await response;
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  
+  } catch (err) {
+    console.error(err);
+    ///return "error";
+    ///return "Server? Wake up!";
+    ///return "Server? Cheer up a bit!";
+    ///return "Server? Together!";
+    ///return {result: {confidences: null, label: '<b translate="no">'+escapeHtml(err.stack)+'</b>' }};  ///err.name+err.message
+    return {result: {confidences: null, label: `<a translate="no" href="mailto:duguaynins@gmail.com?subject=${encodeURIComponent( new Date().toISOString() )}&body=${encodeURIComponent( err.stack )}">mailto:duguaynins@gmail.com</a>` }};  ///escapeHtml(err.stack)
+  }
+}
 </script>
 
 
@@ -341,7 +392,6 @@ texts.forEach((text, index) => {
     
 </body>
 </html>
-
 
 
 
