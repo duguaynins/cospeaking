@@ -11,6 +11,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head translate="yes">
@@ -324,6 +325,8 @@ const itemsPerRow = 8;
 let currentRowMaxHeight = 0;
 let rowElements = [];
 
+
+
 texts.forEach((text, index) => {
   const params = new URLSearchParams(window.location.search);
   const source = "auto";
@@ -337,13 +340,28 @@ texts.forEach((text, index) => {
   const btn = document.createElement("button");
   ///btn.onclick = () => { window.open(tts, '_blank', 'noopener,noreferrer') };
   btn.onclick = async () => {  
-    const outputs = await HuggingFaceAPI({
+
+    const outputs_ipa = await HuggingFaceAPI({
+      group: "duguaynins",
+      space: "RedirectAPI",
+      path: `ipa?text=${encode}&lang=${traget}`,  ///embeddings/meta
+      ///payload: inputs,
+    }); 
+    const ipa = await outputs_ipa.text();  
+    const pre = btn.textContent;
+    console.log(pre, ipa);
+    
+    setTimeout(() => { btn.textContent = ipa; }, 1);  // 單位是毫秒
+    setTimeout(() => { btn.textContent = pre; }, 1000);  // 單位是毫秒
+
+
+    const outputs_tts = await HuggingFaceAPI({
       group: "duguaynins",
       space: "RedirectAPI",
       path: `tts?text=${encode}&lang=${traget}`,  ///embeddings/meta
       ///payload: inputs,
     }); 
-    const blob = await outputs.blob();    
+    const blob = await outputs_tts.blob();    
     const object = URL.createObjectURL(blob);
 
     const audio = new Audio(); // ✅ 先建立 audio 物件
