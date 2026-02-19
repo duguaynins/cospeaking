@@ -340,7 +340,7 @@ texts.forEach((text, index) => {
   const btn = document.createElement("button");
   ///btn.onclick = () => { window.open(tts, '_blank', 'noopener,noreferrer') };
   btn.onclick = async () => {  
-
+    /*
     const outputs_ipa = await HuggingFaceAPI({
       group: "duguaynins",
       space: "RedirectAPI",
@@ -349,10 +349,10 @@ texts.forEach((text, index) => {
     }); 
     const ipa = await outputs_ipa.text();  
     const pre = btn.textContent;
+
     console.log(pre, ipa);
-    
     setTimeout(() => { btn.textContent = ipa; }, 1);  // 單位是毫秒
-    setTimeout(() => { btn.textContent = pre; }, 1000);  // 單位是毫秒
+    setTimeout(() => { btn.textContent = pre; }, 1000);  // 單位是毫秒  */
 
 
     const outputs_tts = await HuggingFaceAPI({
@@ -368,6 +368,10 @@ texts.forEach((text, index) => {
     audio.src = object;
     audio.play();
     audio.onended = () => URL.revokeObjectURL(object);  // 播放完釋放資源
+
+    
+    setTimeout(() => { btn.style.background = "orange"; }, 1);  // 單位是毫秒
+    setTimeout(() => { btn.style.background = "white"; }, 1000);  // 單位是毫秒  */
 
   };
   btn.textContent = text;
