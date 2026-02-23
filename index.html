@@ -329,10 +329,12 @@ let rowElements = [];
 
 
 texts.forEach((text, index) => {
+  const buffer = text.split("/")[0].split(" ")[0];  ///20260222
+  
   const params = new URLSearchParams(window.location.search);
   const source = "auto";
   const traget = params.get("voice") || 'zh';
-  const encode = encodeURIComponent(text);
+  const encode = encodeURIComponent(buffer);  ///text
 
   const tts = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${traget}&q=${encode}`;
   const url = `https://translate.google.com/?sl=${source}&tl=${traget}&q=${encode}`;
