@@ -193,14 +193,12 @@
 
 <div class="input-btn-wrapper" style="display: flex; align-items: stretch; width:100%; text-align: center;">
   <!--button type="button" class="main " translate="no" onclick="document.getElementById('input_msg').value='https://';">❤️📄📚📜💡<p style="margin: 0; padding: 0; font-size: 1vh;" class="label">https://</p></button!-->
-  <button disabled type="button" class="x-main x-use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
-  <input disabled id="input_msg" class="x-main x-use fat" type="text" name="url" autocomplete="off" placeholder="You can use it by clicking the voice button!" style="flex: 1;" list="list_msg"/>
+  <button type="button" class="x-main use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
+  <input id="input_msg" class="x-main use fat" type="text" name="url" autocomplete="off" placeholder="You can use it by clicking the voice button!" style="flex: 1;" list="list_msg"/>
   <datalist id="list_msg_vt">
   </datalist>
-  <button disabled type="button" class="x-main x-use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
+  <button type="button" class="x-main use fat" translate="no" onclick="send()">🚀<p translate="no" style="margin: 0; padding: 0; font-size: 1vh;" class="label">enter</p></button>
 </div>
-
-<button id="input_msgbtn" style="display:none" onclick="send()">Send and Recv</button>
 
 <!-- 放置你原有的布局 -->
             
@@ -480,6 +478,39 @@ async function HuggingFaceAPI(inputs=null) {
     return {result: {confidences: null, label: `<a translate="no" href="mailto:duguaynins@gmail.com?subject=${encodeURIComponent( new Date().toISOString() )}&body=${encodeURIComponent( err.stack )}">mailto:duguaynins@gmail.com</a>` }};  ///escapeHtml(err.stack)
   }
 }
+
+
+async function send() {
+    const buffer = document.getElementById("input_msg").value;
+    const encode = encodeURIComponent(buffer);
+    const traget = "ro";
+  
+    const outputs_tts = await HuggingFaceAPI({
+      group: "duguaynins",
+      space: "RedirectAPI",
+      path: `tts?text=${encode}&lang=${traget}`,  ///embeddings/meta
+      ///payload: inputs,
+    }); 
+    const blob = await outputs_tts.blob();    
+    const object = URL.createObjectURL(blob);
+
+    const audio = new Audio(); // ✅ 先建立 audio 物件
+    audio.src = object;
+    audio.play();
+    audio.onended = () => URL.revokeObjectURL(object);  // 播放完釋放資源
+
+    
+    setTimeout(() => { document.getElementById("input_msg").style.background = "orange"; }, 1);  // 單位是毫秒
+    setTimeout(() => { document.getElementById("input_msg").style.background = "white"; }, 1000);  // 單位是毫秒  */
+}
+
+document.getElementById("input_msg").addEventListener("keydown", function(event) {
+    // event.key === "Enter" 表示按下 Enter
+    if (event.key === "Enter") {
+        event.preventDefault(); // 防止換行（如果是 textarea）
+        send();                 // 呼叫送出函數
+    }
+});
 </script>
 
 
