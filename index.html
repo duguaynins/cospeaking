@@ -424,7 +424,7 @@ texts.forEach((text, index) => {
   
   const params = new URLSearchParams(window.location.search);
   const source = "auto";
-  const traget = params.get("voice") || 'zh';
+  const traget = params.get("voice") || 'ja';  ///zh
   const encode = encodeURIComponent(buffer);  ///text
 
   const tts = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${traget}&q=${encode}`;
