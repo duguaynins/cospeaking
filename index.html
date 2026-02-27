@@ -421,6 +421,7 @@ let rowElements = [];
 
 texts.forEach((text, index) => {
   const buffer = text.split("/")[0].split(" ")[0];  ///20260222
+  document.getElementById("input_msg").value += buffer;  ///20260227
   
   const params = new URLSearchParams(window.location.search);
   const source = "auto";
