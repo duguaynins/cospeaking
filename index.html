@@ -421,7 +421,7 @@ let rowElements = [];
 
 texts.forEach((text, index) => {
   const buffer = text.split("/")[0].split(" ")[0];  ///20260222
-  document.getElementById("input_msg").value += buffer;  ///20260227
+  ///document.getElementById("input_msg").value += buffer;  ///20260227
   
   const params = new URLSearchParams(window.location.search);
   const source = "auto";
@@ -449,7 +449,8 @@ texts.forEach((text, index) => {
     setTimeout(() => { btn.textContent = ipa; }, 1);  // 單位是毫秒
     setTimeout(() => { btn.textContent = pre; }, 1000);  // 單位是毫秒  */
 
-
+    document.getElementById("input_msg").value += buffer;
+    
     const outputs_tts = await HuggingFaceAPI({
       group: "duguaynins",
       space: "RedirectAPI",
