@@ -553,6 +553,19 @@ document.getElementById("input_msg").addEventListener("keydown", function(event)
         send();                 // 呼叫送出函數
     }
 });
+
+document.addEventListener('click', function (e) {
+    // 偵測任何點擊一次
+    if (e.target.tagName === 'BUTTON') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("data")) { document.getElementById('input_msg').value = params.get("data"); }
+        if (params.get("data")) { setTimeout(() => { send(); }, 2000); }  //***
+        /*  // 已經不需要了，會直接複製文字
+        setTimeout(() => { 
+        if (params.get("data")) { document.getElementById('content').innerHTML = `<p translate="no">${params.get("data")}</p>`; }
+        }, 2000);  // 防止過長的內容  */
+    }
+}, { once: true });
 </script>
 
 
