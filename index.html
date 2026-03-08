@@ -526,7 +526,8 @@ async function send() {
     const buffer = document.getElementById("input_msg").value;
     const encode = encodeURIComponent(buffer);
     const traget = "ro";
-  
+
+    if ( !buffer.trim() ) { return; }
     const outputs_tts = await HuggingFaceAPI({
       group: "duguaynins",
       space: "RedirectAPI",
